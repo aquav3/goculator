@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -60,6 +62,28 @@ func tokenize(math string) []Token {
     }
 
     return result
+}
+
+func operation(operator Token, lhs Token, rhs Token) (int, error) { 
+    lhsValue, err := strconv.Atoi(lhs.value)
+    if err != nil {
+        return -1, err
+    }
+    rhsValue, err := strconv.Atoi(rhs.value)
+    if err != nil {
+        return -1, err
+    }
+    switch operator.variant {
+        case Plus:
+            return lhsValue + rhsValue, nil
+        case Minus:
+            return lhsValue - rhsValue, nil
+        case Multiply:
+            return lhsValue * rhsValue, nil
+        case Divide:
+            return lhsValue / rhsValue, nil
+    }
+    return 0, nil
 }
 
 func main() {
