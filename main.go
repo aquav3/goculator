@@ -36,6 +36,32 @@ func getInput(prompt string) (string, error) {
     return input, nil
 }
 
+func tokenize(math string) []Token {
+    elements := strings.Split(math, " ")
+    result := make([]Token, len(elements))
+    for i, n := range elements {
+        go func(i int, n string) {
+            switch n {
+                case "+":
+                    result[i] = Token{value: n, variant: Plus}
+                    return
+                case "-":
+                    result[i] = Token{value: n, variant: Minus}
+                    return
+                case "*":
+                    result[i] = Token{value: n, variant: Multiply}
+                    return
+                case "/":
+                    result[i] = Token{value: n, variant: Divide}
+                    return
+            }     
+            result[i] = Token{value: n, variant: Number}
+        }(i, n)
+    }
+
+    return result
+}
+
 func main() {
     input, err := getInput("Enter the math dude: ") 
     if err != nil {
