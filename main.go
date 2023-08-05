@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+type Variant uint8
+
+const (
+    Number Variant     = 0
+    Plus Variant       = 1
+    Minus Variant      = 2
+    Multiply Variant   = 3
+    Divide Variant     = 4
+)
+
+type Token struct {
+    value string
+    variant Variant
+}
+
 func getInput(prompt string) (string, error) {
     reader := bufio.NewReader(os.Stdin)
 
