@@ -15,5 +15,5 @@ import (
     if err != nil {
         log.Fatalln("Error:", err)
     }
-    fmt.Println(result)
+    fmt.Println(tokens.Compute(tokeys))
 }

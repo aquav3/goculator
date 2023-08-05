@@ -74,7 +74,7 @@ func operation(operator Token, lhs Token, rhs Token) (int, error) {
 }
 
 func Compute(t []Token) int {
-    first := true
+    abc := 0
     firstOperations := make(map[int]Token)
     iterations := t
     for i, n := range t {
@@ -84,7 +84,7 @@ func Compute(t []Token) int {
     }
     
     for key, value := range firstOperations {
-        if !first {key = key - 2}
+        key = key - (2 * abc)
         result, _ := operation(value, t[key-1], t[key+1])
         tk := Token{Value: strconv.Itoa(result), Var: Number}
         iterations[key-1] = tk
@@ -95,8 +95,12 @@ func Compute(t []Token) int {
         rhs := iterations[key+2:]
 
         iterations = append(lhs, rhs...)
-        if first {first = false}
-
+        abc += 1
     }
-
+    
+    if len(iterations) == 1 {
+        result, _ := strconv.Atoi(iterations[0].Value)
+        return result
+    }
+    return -69
 }
