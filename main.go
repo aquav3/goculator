@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
+    "strings"
 )
 
 type Variant uint8
