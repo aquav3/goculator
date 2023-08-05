@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 	"strconv"
-    "strings"
+	"strings"
+	"sync"
 )
 
 type Variant uint8
@@ -38,10 +39,15 @@ func getInput(prompt string) (string, error) {
 }
 
 func tokenize(math string) []Token {
+    var wg sync.WaitGroup
+    defer wg.Wait()
+
     elements := strings.Split(math, " ")
     result := make([]Token, len(elements))
     for i, n := range elements {
+        wg.Add(1)
         go func(i int, n string) {
+            defer wg.Done()
             switch n {
                 case "+":
                     result[i] = Token{value: n, variant: Plus}
@@ -90,6 +96,10 @@ func main() {
     if err != nil {
         log.Fatalln("Error: ", err)
     }
-
-    fmt.Println(input)
+    tokens := tokenize(input)
+    result, err := operation(tokens[1], tokens[0], tokens[2])
+    if err != nil {
+        log.Fatalln("Error:", err)
+    }
+    fmt.Println(result)
 }
