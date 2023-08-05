@@ -1,24 +1,24 @@
 package tokens
 
 import (
-    "sync"
-    "strings"
-    "strconv"
+	"strconv"
+	"strings"
+	"sync"
 )
 
-type Variant uint8
+type Var uint8
 
 const (
-    Number Variant     = 0
-    Plus Variant       = 1
-    Minus Variant      = 2
-    Multiply Variant   = 3
-    Divide Variant     = 4
+    Number Var     = 0
+    Plus Var       = 1
+    Minus Var      = 2
+    Multiply Var   = 3
+    Divide Var     = 4
 )
 
 type Token struct {
     Value string
-    Variant Variant
+    Var Var
 }
 
 func Tokenize(math string) []Token {
@@ -32,26 +32,26 @@ func Tokenize(math string) []Token {
             defer wg.Done()
             switch n {
                 case "+":
-                    result[i] = Token{Value: n, Variant: Plus}
+                    result[i] = Token{Value: n, Var: Plus}
                     return
                 case "-":
-                    result[i] = Token{Value: n, Variant: Minus}
+                    result[i] = Token{Value: n, Var: Minus}
                     return
                 case "*":
-                    result[i] = Token{Value: n, Variant: Multiply}
+                    result[i] = Token{Value: n, Var: Multiply}
                     return
                 case "/":
-                    result[i] = Token{Value: n, Variant: Divide}
+                    result[i] = Token{Value: n, Var: Divide}
                     return
             }     
-            result[i] = Token{Value: n, Variant: Number}
+            result[i] = Token{Value: n, Var: Number}
         }(i, n)
     }
 
     return result
 }
 
-func Operation(operator Token, lhs Token, rhs Token) (int, error) { 
+func operation(operator Token, lhs Token, rhs Token) (int, error) { 
     lhsValue, err := strconv.Atoi(lhs.Value)
     if err != nil {
         return -1, err
@@ -60,7 +60,7 @@ func Operation(operator Token, lhs Token, rhs Token) (int, error) {
     if err != nil {
         return -1, err
     }
-    switch operator.Variant {
+    switch operator.Var {
         case Plus:
             return lhsValue + rhsValue, nil
         case Minus:
@@ -71,4 +71,32 @@ func Operation(operator Token, lhs Token, rhs Token) (int, error) {
             return lhsValue / rhsValue, nil
     }
     return 0, nil
+}
+
+func Compute(t []Token) int {
+    first := true
+    firstOperations := make(map[int]Token)
+    iterations := t
+    for i, n := range t {
+        if n.Var == Multiply || n.Var == Divide {
+            firstOperations[i] = n 
+        } 
+    }
+    
+    for key, value := range firstOperations {
+        if !first {key = key - 2}
+        result, _ := operation(value, t[key-1], t[key+1])
+        tk := Token{Value: strconv.Itoa(result), Var: Number}
+        iterations[key-1] = tk
+        lhs := iterations[:key]
+        if key+2 > len(t) {
+            break
+        }
+        rhs := iterations[key+2:]
+
+        iterations = append(lhs, rhs...)
+        if first {first = false}
+
+    }
+
 }

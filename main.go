@@ -12,7 +12,6 @@ import (
         log.Fatalln("Error: ", err)
     }
     tokeys := tokens.Tokenize(input)
-    result, err := tokens.Operation(tokeys[1], tokeys[0], tokeys[2])
     if err != nil {
         log.Fatalln("Error:", err)
     }
