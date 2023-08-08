@@ -1,19 +1,20 @@
 package tokens
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 )
 
-type Var uint8
+type Var string
 
 const (
-    Number Var     = 0
-    Plus Var       = 1
-    Minus Var      = 2
-    Multiply Var   = 3
-    Divide Var     = 4
+    Number Var     = "Number"
+    Plus Var       = "Plus"
+    Minus Var      = "Minus"
+    Multiply Var   = "Multiply"
+    Divide Var     = "Divide"
 )
 
 type Token struct {
@@ -75,15 +76,23 @@ func operation(operator Token, lhs Token, rhs Token) (int, error) {
 
 func Compute(t []Token) int {
     abc := 0
+    result := 0
     firstOperations := make(map[int]Token)
+    secondOperations := make(map[int]Token)
     iterations := t
     for i, n := range t {
         if n.Var == Multiply || n.Var == Divide {
             firstOperations[i] = n 
-        } 
+        }
+        if n.Var == Plus || n.Var == Minus {
+            secondOperations[i] = n       
+        }
     }
     
     for key, value := range firstOperations {
+        fmt.Println("Left hand side value: ", t[key-1].Value, "Variant: ", t[key-1].Var)
+        fmt.Println("Operator value: ", t[key].Value, "Variant: ", t[key].Var)
+        fmt.Println("Right hand side value: ", t[key+1].Value, "Variant: ", t[key+1].Var)
         key = key - (2 * abc)
         result, _ := operation(value, t[key-1], t[key+1])
         tk := Token{Value: strconv.Itoa(result), Var: Number}
@@ -102,5 +111,24 @@ func Compute(t []Token) int {
         result, _ := strconv.Atoi(iterations[0].Value)
         return result
     }
-    return -69
+    
+    for key, value := range secondOperations {
+        fmt.Println("Left hand side value: ", t[key-1].Value, "Variant: ", t[key-1].Var)
+        fmt.Println("Operator value: ", t[key].Value, "Variant: ", t[key].Var)
+        fmt.Println("Right hand side value: ", t[key+1].Value, "Variant: ", t[key+1].Var)
+        key = key - (2 * abc)
+        result, _ := operation(value, t[key-1], t[key+1])
+        tk := Token{Value: strconv.Itoa(result), Var: Number}
+        iterations[key-1] = tk
+        lhs := iterations[:key]
+        if key+2 > len(t) {
+            break
+        }
+        rhs := iterations[key+2:]
+
+        iterations = append(lhs, rhs...)
+        abc += 1     
+    }
+
+    return result
 }
